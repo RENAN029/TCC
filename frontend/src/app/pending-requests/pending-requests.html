@@ -1,0 +1,175 @@
+<div class="pending-requests-container">
+  <div class="header-section">
+    <button routerLink="/admin-dashboard" class="back-button">← Voltar</button>
+    <h1>Gerenciar Solicitações</h1>
+    <button (click)="logout()" class="logout-button">🚪 Sair</button>
+  </div>
+
+  <div class="filters-section">
+    <div class="filter-buttons">
+      <button 
+        [class.active]="filterStatus === 'all'"
+        (click)="onFilterChange('all')"
+        class="filter-button">
+        Todas
+      </button>
+      <button 
+        [class.active]="filterStatus === 'pending'"
+        (click)="onFilterChange('pending')"
+        class="filter-button">
+        Pendentes
+      </button>
+      <button 
+        [class.active]="filterStatus === 'approved'"
+        (click)="onFilterChange('approved')"
+        class="filter-button">
+        Aprovadas
+      </button>
+      <button 
+        [class.active]="filterStatus === 'rejected'"
+        (click)="onFilterChange('rejected')"
+        class="filter-button">
+        Reprovadas
+      </button>
+    </div>
+    <div class="requests-count">
+      {{ filteredRequests.length }} solicitação(ões) encontrada(s)
+    </div>
+  </div>
+
+  <div class="requests-list">
+    <div *ngFor="let request of filteredRequests" class="request-card">
+      <div class="request-header">
+        <div class="student-info">
+          <h3>{{ request.studentName }}</h3>
+          <p>{{ request.studentEmail }}</p>
+        </div>
+        <div class="request-meta">
+          <span class="request-type" [class.renewal]="request.isRenewal">
+            {{ request.isRenewal ? '🔄 Renovação' : '📝 Nova' }}
+          </span>
+          <span class="request-date">
+            {{ request.submittedAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="request-status">
+        <span [class]="'status-badge ' + request.status">
+          {{ getStatusText(request.status) }}
+        </span>
+      </div>
+
+      <div class="request-actions">
+        <button 
+          (click)="viewRequest(request)"
+          class="btn btn-info">
+          👁️ Ver Detalhes
+        </button>
+        
+        <button 
+          *ngIf="request.status === 'pending'"
+          (click)="approveRequest(request)"
+          class="btn btn-success">
+          ✅ Aprovar
+        </button>
+        
+        <button 
+          *ngIf="request.status === 'pending'"
+          (click)="rejectRequest(request)"
+          class="btn btn-danger">
+          ❌ Reprovar
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="filteredRequests.length === 0" class="no-requests">
+      <div class="no-requests-icon">📭</div>
+      <h3>Nenhuma solicitação encontrada</h3>
+      <p>Não há solicitações com o filtro selecionado.</p>
+    </div>
+  </div>
+
+  <div *ngIf="selectedRequest" class="modal-overlay" (click)="closeDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalhes da Solicitação</h2>
+        <button (click)="closeDetails()" class="close-button">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-section">
+          <h3>Informações do Estudante</h3>
+          <div class="detail-grid">
+            <div><strong>Nome:</strong> {{ selectedRequest.personalInfo.name }}</div>
+            <div><strong>Email:</strong> {{ selectedRequest.studentEmail }}</div>
+            <div><strong>CPF:</strong> {{ selectedRequest.personalInfo.cpf }}</div>
+            <div><strong>Data Nasc.:</strong> {{ selectedRequest.personalInfo.birthDate | date:'dd/MM/yyyy' }}</div>
+            <div><strong>Gênero:</strong> {{ selectedRequest.personalInfo.gender }}</div>
+            <div><strong>Escolaridade:</strong> {{ getEducationLevelText(selectedRequest.personalInfo.educationLevel) }}</div>
+            <div><strong>Matrícula:</strong> {{ selectedRequest.personalInfo.registrationNumber }}</div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Endereço</h3>
+          <div class="address-info">
+            {{ selectedRequest.address.street }}, {{ selectedRequest.address.number }}<br>
+            {{ selectedRequest.address.neighborhood }}<br>
+            {{ selectedRequest.address.city }} - {{ selectedRequest.address.state }}
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Documentos</h3>
+          <div class="documents-actions">
+            <button 
+              (click)="showPhoto = !showPhoto" 
+              class="btn btn-info document-btn">
+              📷 {{ showPhoto ? 'Ocultar Foto' : 'Visualizar Foto' }}
+            </button>
+            <button 
+              (click)="showEnrollment = !showEnrollment" 
+              class="btn btn-info document-btn">
+              📄 {{ showEnrollment ? 'Ocultar Comprovante' : 'Visualizar Comprovante' }}
+            </button>
+          </div>
+
+          <div *ngIf="showPhoto" class="document-preview">
+            <h4>Foto do Estudante</h4>
+            <div class="photo-container" *ngIf="selectedRequest.documents.photoUrl">
+              <img [src]="selectedRequest.documents.photoUrl" alt="Foto do Estudante" class="student-photo-preview">
+            </div>
+            <div class="no-document" *ngIf="!selectedRequest.documents.photoUrl">
+              <p>❌ Foto não disponível</p>
+            </div>
+          </div>
+
+          <div *ngIf="showEnrollment" class="document-preview">
+            <h4>Comprovante de Matrícula</h4>
+            <div class="enrollment-container" *ngIf="selectedRequest.documents.enrollmentFile">
+              <p><strong>Arquivo:</strong> {{ selectedRequest.documents.enrollmentFile }}</p>
+              <p class="document-note">⚠️ Em um sistema real, aqui seria exibido o PDF/Imagem do comprovante</p>
+            </div>
+            <div class="no-document" *ngIf="!selectedRequest.documents.enrollmentFile">
+              <p>❌ Comprovante não disponível</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" *ngIf="selectedRequest.status === 'pending'">
+        <button 
+          (click)="rejectRequest(selectedRequest)"
+          class="btn btn-danger">
+          ❌ Reprovar Solicitação
+        </button>
+        <button 
+          (click)="approveRequest(selectedRequest)"
+          class="btn btn-success">
+          ✅ Aprovar Solicitação
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

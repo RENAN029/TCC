@@ -1,0 +1,284 @@
+<div class="renewal-container">
+  <div class="renewal-header">
+    <h2>Solicitar Renovação da Carteirinha</h2>
+    <p>Preencha os dados para renovar sua carteirinha estudantil</p>
+  </div>
+
+  <div class="data-option-section">
+    <h3>Deseja usar seus dados existentes?</h3>
+    <div class="option-buttons">
+      <button 
+        [class.active]="useExistingData"
+        (click)="useExistingData = true; onUseExistingDataChange()"
+        class="option-button">
+        ✅ Manter dados atuais
+      </button>
+      <button 
+        [class.active]="!useExistingData"
+        (click)="useExistingData = false; onUseExistingDataChange()"
+        class="option-button">
+        ✏️ Atualizar dados
+      </button>
+    </div>
+
+    <div *ngIf="useExistingData && existingData" class="existing-data-preview">
+      <h4>Seus dados atuais:</h4>
+      <div class="data-grid">
+        <div><strong>Nome:</strong> {{ existingData.studentName }}</div>
+        <div><strong>CPF:</strong> {{ existingData.cpf }}</div>
+        <div><strong>Data Nasc.:</strong> {{ existingData.birthDate | date:'dd/MM/yyyy' }}</div>
+        <div><strong>Endereço:</strong> {{ existingData.address?.street }}, {{ existingData.address?.number }}</div>
+      </div>
+    </div>
+  </div>
+
+  <form (ngSubmit)="submitRenewal()" class="renewal-form" *ngIf="!useExistingData">
+    <!-- Dados Pessoais -->
+    <div class="form-section">
+      <h3>Dados Pessoais</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Nome Completo *</label>
+          <input 
+            type="text" 
+            id="name"
+            [(ngModel)]="renewalRequest.personalInfo.name" 
+            name="name"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gênero *</label>
+          <select 
+            id="gender"
+            [(ngModel)]="renewalRequest.personalInfo.gender" 
+            name="gender"
+            required
+            class="form-input">
+            <option value="">Selecione</option>
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+            <option value="outro">Outro</option>
+            <option value="prefiro_nao_informar">Prefiro não informar</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="birthDate">Data de Nascimento *</label>
+          <input 
+            type="date" 
+            id="birthDate"
+            [(ngModel)]="renewalRequest.personalInfo.birthDate" 
+            name="birthDate"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="cpf">CPF *</label>
+          <input 
+            type="text" 
+            id="cpf"
+            [(ngModel)]="renewalRequest.personalInfo.cpf" 
+            name="cpf"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="educationLevel">Escolaridade *</label>
+          <select 
+            id="educationLevel"
+            [(ngModel)]="renewalRequest.personalInfo.educationLevel" 
+            name="educationLevel"
+            required
+            class="form-input">
+            <option value="">Selecione</option>
+            <option value="ensino_medio">Ensino Médio</option>
+            <option value="graduacao">Graduação</option>
+            <option value="pos_graduacao">Pós-Graduação</option>
+            <option value="mestrado">Mestrado</option>
+            <option value="doutorado">Doutorado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Endereço -->
+    <div class="form-section">
+      <h3>Endereço</h3>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="street">Logradouro *</label>
+          <input 
+            type="text" 
+            id="street"
+            [(ngModel)]="renewalRequest.address.street" 
+            name="street"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="number">Número *</label>
+          <input 
+            type="text" 
+            id="number"
+            [(ngModel)]="renewalRequest.address.number" 
+            name="number"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="neighborhood">Bairro *</label>
+          <input 
+            type="text" 
+            id="neighborhood"
+            [(ngModel)]="renewalRequest.address.neighborhood" 
+            name="neighborhood"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="city">Cidade *</label>
+          <input 
+            type="text" 
+            id="city"
+            [(ngModel)]="renewalRequest.address.city" 
+            name="city"
+            required
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="state">Estado *</label>
+          <select 
+            id="state"
+            [(ngModel)]="renewalRequest.address.state" 
+            name="state"
+            required
+            class="form-input">
+            <option value="">Selecione</option>
+            <option value="AC">Acre</option>
+            <option value="AL">Alagoas</option>
+            <!-- Outros estados -->
+            <option value="SP">São Paulo</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentos -->
+    <div class="form-section">
+      <h3>Documentos para Renovação</h3>
+      
+      <div class="documents-grid">
+        <div class="document-upload">
+          <label for="enrollmentFile">Novo Comprovante de Matrícula *</label>
+          <div class="upload-area" [class.has-file]="renewalRequest.documents.enrollmentFile">
+            <input 
+              type="file" 
+              id="enrollmentFile"
+              (change)="onEnrollmentFileSelected($event)"
+              accept=".pdf,.jpg,.jpeg,.png"
+              class="file-input">
+            <div class="upload-content">
+              <div class="upload-icon">📄</div>
+              <p *ngIf="!renewalRequest.documents.enrollmentFile">
+                Clique para selecionar o comprovante de matrícula atualizado
+              </p>
+              <p *ngIf="renewalRequest.documents.enrollmentFile" class="file-name">
+                {{ renewalRequest.documents.enrollmentFile.name }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="document-upload">
+          <label for="photoFile">Nova Foto 3x4 *</label>
+          <div class="upload-area" [class.has-file]="renewalRequest.documents.photoFile">
+            <input 
+              type="file" 
+              id="photoFile"
+              (change)="onPhotoFileSelected($event)"
+              accept=".jpg,.jpeg,.png"
+              class="file-input">
+            <div class="upload-content">
+              <div class="upload-icon">📷</div>
+              <p *ngIf="!renewalRequest.documents.photoFile">
+                Clique para selecionar nova foto 3x4
+              </p>
+              <p *ngIf="renewalRequest.documents.photoFile" class="file-name">
+                {{ renewalRequest.documents.photoFile.name }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        (click)="navigateToDashboard()"
+        class="btn btn-secondary">
+        ← Cancelar
+      </button>
+
+      <button 
+        type="submit"
+        class="btn btn-success">
+        ✅ Enviar Solicitação de Renovação
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="useExistingData" class="renewal-with-existing">
+    <div class="existing-renewal-info">
+      <h3>Renovação com dados existentes</h3>
+      <p>Será utilizada a mesma foto e dados do seu cadastro atual.</p>
+      <p><strong>Atenção:</strong> É necessário anexar o comprovante de matrícula atualizado.</p>
+    </div>
+
+    <div class="document-upload-single">
+      <label for="enrollmentFileExisting">Comprovante de Matrícula Atualizado *</label>
+      <div class="upload-area" [class.has-file]="renewalRequest.documents.enrollmentFile">
+        <input 
+          type="file" 
+          id="enrollmentFileExisting"
+          (change)="onEnrollmentFileSelected($event)"
+          accept=".pdf,.jpg,.jpeg,.png"
+          class="file-input">
+        <div class="upload-content">
+          <div class="upload-icon">📄</div>
+          <p *ngIf="!renewalRequest.documents.enrollmentFile">
+            Clique para selecionar o comprovante de matrícula atualizado
+          </p>
+          <p *ngIf="renewalRequest.documents.enrollmentFile" class="file-name">
+            {{ renewalRequest.documents.enrollmentFile.name }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        (click)="navigateToDashboard()"
+        class="btn btn-secondary">
+        ← Cancelar
+      </button>
+
+      <button 
+        type="button"
+        (click)="submitRenewal()"
+        [disabled]="!renewalRequest.documents.enrollmentFile"
+        class="btn btn-success">
+        ✅ Enviar Renovação
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,143 @@
+<div class="login-container">
+  <div class="login-card">
+    
+    <!-- Cabeçalho com seletor de tipo -->
+    <div class="login-header">
+      <h2>Login - Carteirinha Estudantil</h2>
+      
+      <div class="login-type-selector">
+        <button 
+          [class.active]="loginType === 'student'" 
+          (click)="switchLoginType('student')"
+          class="type-button">
+          Estudante
+        </button>
+        <button 
+          [class.active]="loginType === 'admin'" 
+          (click)="switchLoginType('admin')"
+          class="type-button">
+          Administrador
+        </button>
+      </div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div *ngIf="loginType === 'admin'" class="login-form">
+      <div class="form-group">
+        <label for="adminUsername">Usuário:</label>
+        <input 
+          type="text" 
+          id="adminUsername"
+          [(ngModel)]="adminUsername"
+          placeholder="Nome de usuário"
+          class="form-input">
+      </div>
+      <div class="form-group">
+        <label for="adminPassword">Senha:</label>
+        <input 
+          type="password" 
+          id="adminPassword"
+          [(ngModel)]="adminPassword"
+          placeholder="Senha"
+          class="form-input">
+      </div>
+      <button (click)="onLogin()" class="login-button">Entrar como Administrador</button>
+    </div>
+
+    <!-- STUDENT LOGIN - FLUXO SIMPLIFICADO -->
+    <div *ngIf="loginType === 'student'">
+      
+      <!-- STEP 1: Email -->
+      <div *ngIf="currentStep === 'email'" class="login-form">
+        <div class="form-group">
+          <label for="studentEmail">Email Institucional:</label>
+          <input 
+            type="email" 
+            id="studentEmail"
+            [(ngModel)]="studentEmail"
+            placeholder="seu.email@escolar.ifrn.edu.br"
+            class="form-input">
+        </div>
+        <button (click)="onLogin()" class="login-button">Continuar</button>
+        
+        <div class="login-info">
+          <p>Digite seu email institucional para continuar.</p>
+        </div>
+      </div>
+
+      <!-- STEP 2: Senha (estudante existente) -->
+      <div *ngIf="currentStep === 'password'" class="login-form">
+        <div class="step-header">
+          <button (click)="backToEmail()" class="back-button">←</button>
+          <h3>Digite sua senha</h3>
+        </div>
+        
+        <div class="form-group">
+          <label for="studentPassword">Senha:</label>
+          <input 
+            type="password" 
+            id="studentPassword"
+            [(ngModel)]="studentPassword"
+            placeholder="Sua senha"
+            class="form-input"
+            (keyup.enter)="verifyStudentPassword()">
+        </div>
+        
+        <button (click)="verifyStudentPassword()" class="login-button">Entrar</button>
+        
+        <div class="login-help">
+          <p>Esqueceu sua senha? <a href="#" class="help-link">Recuperar senha</a></p>
+        </div>
+      </div>
+
+      <!-- STEP 3: Criar Senha (novo estudante) -->
+      <div *ngIf="currentStep === 'createPassword'" class="create-password-section">
+        <div class="step-header">
+          <button (click)="backToEmail()" class="back-button">←</button>
+          <h3>Criar Senha</h3>
+        </div>
+        
+        <div class="create-password-info">
+          <p>Crie uma senha para sua conta:</p>
+          <p class="student-email">{{ studentEmail }}</p>
+        </div>
+
+        <div class="password-form">
+          <div class="form-group">
+            <label for="newPassword">Nova Senha:</label>
+            <input 
+              type="password" 
+              id="newPassword"
+              [(ngModel)]="newPassword"
+              placeholder="Mínimo 6 caracteres"
+              class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar Senha:</label>
+            <input 
+              type="password" 
+              id="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              placeholder="Digite a senha novamente"
+              class="form-input"
+              (keyup.enter)="createPassword()">
+          </div>
+
+          <button 
+            (click)="createPassword()"
+            class="login-button">
+            ✅ Criar Conta
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Mensagens de erro -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,315 @@
+.email-domains-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.header-section h1 {
+  color: #2a5298;
+  margin-bottom: 0.5rem;
+}
+
+.stats-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2a5298;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.actions-section {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #2a5298;
+  color: white;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.add-domain-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.add-domain-form h3 {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2a5298;
+}
+
+.form-group small {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.form-actions {
+  text-align: center;
+}
+
+.domains-list h3 {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.no-domains {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.no-domains-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.no-domains h4 {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.no-domains p {
+  color: #999;
+  margin: 0;
+}
+
+.domain-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.domain-card:hover {
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.domain-info {
+  flex: 1;
+}
+
+.domain-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.domain-header h4 {
+  margin: 0;
+  color: #333;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.status-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.institution {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-weight: 500;
+}
+
+.created-at {
+  margin: 0;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.domain-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.info-section {
+  background: #e3f2fd;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+  border-left: 4px solid #2a5298;
+}
+
+.info-section h4 {
+  color: #2a5298;
+  margin-bottom: 1rem;
+}
+
+.info-section ul {
+  margin: 0;
+  color: #333;
+}
+
+.info-section li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.info-section code {
+  background: white;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-family: monospace;
+  color: #2a5298;
+}
+
+@media (max-width: 768px) {
+  .email-domains-container {
+    padding: 1rem;
+  }
+  
+  .header-section {
+    text-align: center;
+  }
+  
+  .back-button {
+    position: static;
+    margin-bottom: 1rem;
+    transform: none;
+  }
+  
+  .stats-card {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .domain-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .domain-actions {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,110 @@
+<div class="email-domains-container">
+  <div class="header-section">
+    <button routerLink="/admin-dashboard" class="back-button">← Voltar</button>
+    <h1>Gerenciar Domínios de Email</h1>
+    <p>Configure os domínios de email institucionais permitidos para login</p>
+  </div>
+
+  <div class="stats-card">
+    <div class="stat-item">
+      <div class="stat-number">{{ domains.length }}</div>
+      <div class="stat-label">Domínios Cadastrados</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ getActiveDomainsCount() }}</div>
+      <div class="stat-label">Domínios Ativos</div>
+    </div>
+  </div>
+
+  <div class="actions-section">
+    <button 
+      (click)="showAddForm = !showAddForm"
+      class="btn btn-primary">
+      {{ showAddForm ? '✖️ Cancelar' : '➕ Adicionar Domínio' }}
+    </button>
+  </div>
+
+  <div *ngIf="showAddForm" class="add-domain-form">
+    <h3>Adicionar Novo Domínio</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="newDomain">Domínio de Email *</label>
+        <input 
+          type="text" 
+          id="newDomain"
+          [(ngModel)]="newDomain"
+          placeholder="@escolar.ifrn.edu.br"
+          class="form-input">
+        <small>Inclua o símbolo @ no início do domínio</small>
+      </div>
+
+      <div class="form-group">
+        <label for="newInstitution">Instituição *</label>
+        <input 
+          type="text" 
+          id="newInstitution"
+          [(ngModel)]="newInstitution"
+          placeholder="IFRN"
+          class="form-input">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        (click)="addDomain()"
+        [disabled]="!newDomain || !newInstitution"
+        class="btn btn-success">
+        ✅ Adicionar Domínio
+      </button>
+    </div>
+  </div>
+
+  <div class="domains-list">
+    <h3>Domínios Cadastrados</h3>
+    
+    <div *ngIf="domains.length === 0" class="no-domains">
+      <div class="no-domains-icon">📧</div>
+      <h4>Nenhum domínio cadastrado</h4>
+      <p>Adicione domínios de email institucionais para permitir o login dos estudantes.</p>
+    </div>
+
+    <div *ngFor="let domain of domains" class="domain-card">
+      <div class="domain-info">
+        <div class="domain-header">
+          <h4>{{ domain.domain }}</h4>
+          <span [class]="'status-badge ' + (domain.isActive ? 'active' : 'inactive')">
+            {{ domain.isActive ? 'Ativo' : 'Inativo' }}
+          </span>
+        </div>
+        <p class="institution">{{ domain.institution }}</p>
+        <p class="created-at">
+          Cadastrado em: {{ domain.createdAt | date:'dd/MM/yyyy' }}
+        </p>
+      </div>
+
+      <div class="domain-actions">
+        <button 
+          (click)="toggleDomainStatus(domain)"
+          [class]="domain.isActive ? 'btn btn-warning' : 'btn btn-success'">
+          {{ domain.isActive ? '⏸️ Desativar' : '▶️ Ativar' }}
+        </button>
+        
+        <button 
+          (click)="deleteDomain(domain)"
+          class="btn btn-danger">
+          🗑️ Remover
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h4>💡 Como funciona:</h4>
+    <ul>
+      <li>Estudantes só podem fazer login com emails que terminem nos domínios ativos listados acima</li>
+      <li>Domínios inativos não são aceitos para novos logins</li>
+      <li>Certifique-se de que o domínio inclui o símbolo @ no início</li>
+      <li>Exemplo: <code>@escolar.ifrn.edu.br</code></li>
+    </ul>
+  </div>
+</div>

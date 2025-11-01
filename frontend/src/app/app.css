@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Arial', sans-serif;
+}
+
+.main-content {
+  flex: 1;
+  background: #f8f9fa;
+}
+
+.app-footer {
+  background: #343a40;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-top: auto;
+}

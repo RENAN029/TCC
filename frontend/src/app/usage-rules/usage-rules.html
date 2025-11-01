@@ -1,0 +1,42 @@
+<div class="rules-container">
+  <div class="rules-header">
+    <button (click)="goBack()" class="back-button">← Voltar</button>
+    <h1>Normas de Uso da Carteirinha</h1>
+    <p>Regras e condições para utilização do transporte escolar universitário</p>
+  </div>
+
+  <div class="rules-grid">
+    <div *ngFor="let rule of rules" class="rule-card">
+      <div class="rule-icon">{{ rule.icon }}</div>
+      <h3 class="rule-title">{{ rule.title }}</h3>
+      <p class="rule-description">{{ rule.description }}</p>
+    </div>
+  </div>
+
+  <div class="important-notes">
+    <h2>Observações Importantes</h2>
+    <div class="notes-grid">
+      <div class="note-item">
+        <h4>🔄 Renovação</h4>
+        <p>Solicite a renovação com 30 dias de antecedência da data de expiração</p>
+      </div>
+      <div class="note-item">
+        <h4>📞 Contato</h4>
+        <p>Em caso de dúvidas ou problemas, entre em contato com a administração</p>
+      </div>
+      <div class="note-item">
+        <h4>⚖️ Sanções</h4>
+        <p>O descumprimento das normas pode resultar em suspensão do benefício</p>
+      </div>
+      <div class="note-item">
+        <h4>📱 Aplicativo</h4>
+        <p>Baixe o aplicativo oficial para acompanhar seus benefícios e rotas</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-footer">
+    <p><strong>Última atualização:</strong> {{ currentDate | date:'dd/MM/yyyy' }}</p>
+    <p class="footer-note">Estas normas estão sujeitas a alterações. Consulte regularmente por atualizações.</p>
+  </div>
+</div>

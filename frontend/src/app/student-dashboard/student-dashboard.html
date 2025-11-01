@@ -1,0 +1,158 @@
+<div class="dashboard-container">
+  <div class="header-section">
+    <h1>Carteirinha Estudantil</h1>
+    <button (click)="logout()" class="logout-button">🚪 Sair</button>
+  </div>
+
+  <div class="welcome-section">
+    <h2>Bem-vindo, Estudante!</h2>
+    <p>Email: {{ studentEmail }}</p>
+    
+    <button 
+      (click)="toggleTestOptions()" 
+      class="test-button"
+      *ngIf="!showTestOptions">
+      🧪 Opções de Teste
+    </button>
+    
+    <button 
+      (click)="toggleTestOptions()" 
+      class="test-button"
+      *ngIf="showTestOptions">
+      ❌ Fechar Testes
+    </button>
+  </div>
+
+  <div *ngIf="showTestOptions" class="test-options">
+    <h3>🧪 Opções de Teste (Desenvolvimento)</h3>
+    
+    <div class="test-buttons">
+      <button 
+        (click)="expireCardForTesting()"
+        class="btn btn-warning"
+        *ngIf="currentCard">
+        ⏰ Expirar Carteirinha
+      </button>
+      
+      <button 
+        (click)="rejectCardForTesting()"
+        class="btn btn-danger"
+        *ngIf="currentCard">
+        ❌ Recusar Carteirinha
+      </button>
+      
+      <button 
+        (click)="createValidCardForTesting()"
+        class="btn btn-success">
+        ✅ Criar Carteirinha Válida
+      </button>
+      
+      <button 
+        (click)="createExpiringCardForTesting()"
+        class="btn btn-info">
+        📅 Criar Carteirinha a Expirar
+      </button>
+    </div>
+    
+    <div class="test-info" *ngIf="currentCard">
+      <h4>Informações da Carteirinha:</h4>
+      <p><strong>Status:</strong> {{ getStatusText(studentStatus) }}</p>
+      <p><strong>Expira em:</strong> {{ currentCard.expirationDate | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p><strong>Está expirada?</strong> {{ isCardExpired() ? 'SIM ✅' : 'NÃO' }}</p>
+      <p *ngIf="rejectionReason"><strong>Motivo da recusa:</strong> {{ rejectionReason }}</p>
+    </div>
+  </div>
+
+  <div class="card-status" *ngIf="studentStatus !== 'none'">
+    <div [class]="'status-card ' + getStatusBadgeClass()">
+      <h3>Status da Sua Carteirinha</h3>
+      <p><strong>Status:</strong> 
+        <span [class]="'status-badge ' + studentStatus">
+          {{ getStatusText(studentStatus) }}
+        </span>
+      </p>
+      
+      <div *ngIf="studentStatus === 'active' || studentStatus === 'expired'">
+        <p *ngIf="currentCard && currentCard.expirationDate">
+          <strong>Validade:</strong> {{ currentCard.expirationDate | date:'dd/MM/yyyy' }}
+        </p>
+        <p *ngIf="currentCard && currentCard.registrationNumber">
+          <strong>Número de Matrícula:</strong> {{ currentCard.registrationNumber }}
+        </p>
+      </div>
+
+      <div *ngIf="studentStatus === 'rejected' && rejectionReason" class="rejection-reason">
+        <h4>📝 Motivo da Recusa:</h4>
+        <div class="rejection-message">
+          {{ rejectionReason }}
+        </div>
+        <p class="rejection-help">
+          <strong>O que fazer?</strong> Corrija os problemas mencionados acima e solicite uma nova carteirinha.
+        </p>
+      </div>
+
+      <div *ngIf="studentStatus === 'rejected' && !rejectionReason" class="rejection-reason">
+        <h4>📝 Solicitação Recusada</h4>
+        <div class="rejection-message">
+          Sua solicitação foi recusada pela administração.
+        </div>
+        <p class="rejection-help">
+          <strong>O que fazer?</strong> Entre em contato com a administração para mais informações ou solicite uma nova carteirinha.
+        </p>
+      </div>
+
+      <p *ngIf="hasPendingRequest" class="pending-notice">
+        ⏳ Sua solicitação está em análise pela administração
+      </p>
+      
+      <div *ngIf="isCardExpired() && studentStatus === 'expired'" class="expiration-warning">
+        ⚠️ Sua carteirinha está expirada! Solicite a renovação.
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-grid">
+    <div class="action-card" (click)="requestNewCard()" *ngIf="canRequestNewCard()">
+      <div class="action-icon">📝</div>
+      <h3>Solicitar Carteirinha</h3>
+      <p>Preencha o formulário para solicitar sua primeira carteirinha</p>
+    </div>
+
+    <div class="action-card" (click)="requestRenewal()" *ngIf="canRequestRenewal() && !hasPendingRequest">
+      <div class="action-icon">🔄</div>
+      <h3>Solicitar Renovação</h3>
+      <p *ngIf="studentStatus === 'rejected'">Sua solicitação anterior foi recusada. Clique para enviar uma nova.</p>
+      <p *ngIf="studentStatus === 'expired'">Sua carteirinha expirou. Renove para continuar usando o transporte.</p>
+    </div>
+
+    <div class="action-card pending" *ngIf="hasPendingRequest">
+      <div class="action-icon">⏳</div>
+      <h3>Solicitação em Análise</h3>
+      <p>Sua solicitação está sendo analisada pela administração</p>
+    </div>
+
+    <div class="action-card" (click)="viewMyCard()" *ngIf="currentCard && studentStatus === 'active'">
+      <div class="action-icon">🎫</div>
+      <h3>Minha Carteirinha</h3>
+      <p>Visualize sua carteirinha digital</p>
+    </div>
+
+    <div class="action-card" (click)="viewUsageRules()">
+      <div class="action-icon">📋</div>
+      <h3>Normas de Uso</h3>
+      <p>Consulte as regras de utilização do transporte</p>
+    </div>
+
+    <div class="action-card info" *ngIf="studentStatus === 'none' && !hasPendingRequest && !currentCard">
+      <div class="action-icon">ℹ️</div>
+      <h3>Primeira Vez Aqui?</h3>
+      <p>Você ainda não possui uma carteirinha. Clique em "Solicitar Carteirinha" para começar.</p>
+    </div>
+
+    <div class="action-card contact" *ngIf="studentStatus === 'rejected'">
+      <div class="action-icon">📞</div>
+      <h3>Precisa de Ajuda?</h3>
+      <p>Em caso de dúvidas sobre a recusa, entre em contato com a administração.</p>
+    </div>
+  </div>
+</div>

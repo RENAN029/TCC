@@ -1,0 +1,97 @@
+<div class="card-container" *ngIf="card">
+  <div class="header-section">
+    <button routerLink="/student-dashboard" class="back-button">← Voltar</button>
+    <h1>Minha Carteirinha</h1>
+  </div>
+
+  <div class="card-actions">
+    <button (click)="printCard()" class="action-button print">🖨️ Imprimir</button>
+    <button (click)="downloadCard()" class="action-button download">📥 Download</button>
+  </div>
+
+  <div class="student-card" id="student-card">
+    <!-- Cabeçalho da Carteirinha -->
+    <div class="card-header">
+      <div class="institution-info">
+        <h2 class="institution-name">IFRN</h2>
+        <p class="institution-subtitle">Instituto Federal do Rio Grande do Norte</p>
+      </div>
+      <div class="card-type">
+        <span>Carteirinha Estudantil</span>
+      </div>
+    </div>
+
+    <!-- Corpo da Carteirinha -->
+    <div class="card-main">
+      <!-- Seção da Foto -->
+      <div class="photo-section">
+        <div class="photo-container">
+          <div class="photo-placeholder" *ngIf="!hasPhoto()">
+            <div class="photo-icon">📷</div>
+            <span class="photo-text">FOTO</span>
+          </div>
+          <img *ngIf="hasPhoto()" [src]="getPhotoUrl()" alt="Foto do Estudante" class="student-photo">
+        </div>
+        <div class="photo-frame"></div>
+      </div>
+
+      <!-- Seção de Informações -->
+      <div class="info-section">
+        <div class="student-name">
+          {{ card.studentName }}
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">MATRÍCULA</span>
+            <span class="info-value">{{ card.registrationNumber }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="info-label">CPF</span>
+            <span class="info-value">{{ card.cpf }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="info-label">NASCIMENTO</span>
+            <span class="info-value">{{ card.birthDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="info-label">CURSO</span>
+            <span class="info-value">{{ card.course }}</span>
+          </div>
+        </div>
+
+        <!-- Validade -->
+        <div class="validity-section">
+          <div class="validity-label">VÁLIDA ATÉ</div>
+          <div class="validity-date">{{ card.expirationDate | date:'dd/MM/yyyy' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé Minimalista -->
+    <div class="card-footer">
+      <div class="card-id">{{ card.id }}</div>
+      <div class="security-strip"></div>
+    </div>
+  </div>
+
+  <!-- Notas Importantes -->
+  <div class="card-notes">
+    <h3>Observações Importantes</h3>
+    <ul>
+      <li>Documento de uso pessoal e intransferível</li>
+      <li>Apresentar ao motorista no momento do embarque</li>
+      <li>Em caso de perda, solicitar 2ª via imediatamente</li>
+      <li>Conserve em bom estado - evite dobrar ou molhar</li>
+    </ul>
+  </div>
+</div>
+
+<div *ngIf="!card" class="no-card">
+  <h2>Carteirinha não encontrada</h2>
+  <p>Solicite sua carteirinha através do painel do estudante.</p>
+  <button routerLink="/student-dashboard" class="back-button">Voltar ao Painel</button>
+</div>

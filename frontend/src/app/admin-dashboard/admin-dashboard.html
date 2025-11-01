@@ -1,0 +1,90 @@
+<div class="admin-dashboard">
+  <div class="header-section">
+    <button (click)="logout()" class="logout-button">🚪 Sair</button>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="dashboard-header">
+      <h1>Painel Administrativo</h1>
+      <p>Gerencie solicitações e carteirinhas dos estudantes</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card total-students">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <h3>{{ stats.totalStudents }}</h3>
+          <p>Total de Estudantes</p>
+        </div>
+      </div>
+
+      <div class="stat-card pending-requests">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <h3>{{ stats.pendingRequests }}</h3>
+          <p>Solicitações Pendentes</p>
+        </div>
+      </div>
+
+      <div class="stat-card active-cards">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <h3>{{ stats.activeCards }}</h3>
+          <p>Carteirinhas Ativas</p>
+        </div>
+      </div>
+
+      <div class="stat-card expired-cards">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <h3>{{ stats.expiredCards }}</h3>
+          <p>Carteirinhas Expiradas</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-actions">
+      <h2>Ações Rápidas</h2>
+      <div class="actions-grid">
+        <div class="action-card" (click)="navigateTo('/pending-requests')">
+          <div class="action-icon">📋</div>
+          <h3>Gerenciar Solicitações</h3>
+          <p>Aprovar ou reprovar solicitações de carteirinha</p>
+          <span class="badge" *ngIf="stats.pendingRequests > 0">{{ stats.pendingRequests }} pendentes</span>
+        </div>
+
+        <div class="action-card" (click)="navigateTo('/email-domains')">
+          <div class="action-icon">📧</div>
+          <h3>Domínios de Email</h3>
+          <p>Gerenciar domínios de email institucionais permitidos</p>
+        </div>
+
+        <div class="action-card" (click)="navigateTo('/student-management')">
+          <div class="action-icon">👨‍🎓</div>
+          <h3>Gerenciar Estudantes</h3>
+          <p>Visualizar, editar ou remover estudantes do sistema</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <h2>Atividade Recente</h2>
+      <div class="activity-list" *ngIf="recentActivity.length > 0">
+        <div *ngFor="let activity of recentActivity" class="activity-item">
+          <div class="activity-icon" [class]="activity.type">
+            <span *ngIf="activity.type === 'request'">📝</span>
+            <span *ngIf="activity.type === 'login'">👤</span>
+          </div>
+          <div class="activity-details">
+            <strong>{{ activity.student }}</strong>
+            <span>{{ activity.action }}</span>
+          </div>
+          <div class="activity-time">{{ activity.time }}</div>
+        </div>
+      </div>
+      <div *ngIf="recentActivity.length === 0" class="no-activity">
+        <p>Nenhuma atividade recente</p>
+      </div>
+    </div>
+  </div>
+</div>
