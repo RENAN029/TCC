@@ -39,30 +39,66 @@ export class AdminDashboard implements OnInit {
   }
 
   loadDashboardData() {
+    // Carregar dados REAIS do localStorage
     this.loadRealStats();
     this.loadRecentActivity();
   }
 
   private loadRealStats() {
+    // Estudantes
     const students = this.getStudents();
     this.stats.totalStudents = students.length;
 
+    // Solicitações pendentes
     const pendingRequests = this.getPendingRequests();
     this.stats.pendingRequests = pendingRequests.filter((req: any) => req.status === 'pending').length;
 
+    // Carteirinhas ativas e expiradas - CORREÇÃO AQUI
     let activeCards = 0;
     let expiredCards = 0;
 
     students.forEach((student: any) => {
-      if (student.cardStatus === 'active') {
-        activeCards++;
-      } else if (student.cardStatus === 'expired') {
-        expiredCards++;
+      // Verificar se o estudante tem uma carteirinha salva
+      const card = this.getStudentCard(student.email);
+      
+      if (card) {
+        if (card.status === 'active') {
+          // Verificar se a carteirinha ativa está expirada
+          if (this.isCardExpired(card)) {
+            expiredCards++;
+          } else {
+            activeCards++;
+          }
+        } else if (card.status === 'expired') {
+          expiredCards++;
+        }
+      } else {
+        // Se não tem carteirinha, verificar pelo status do estudante
+        if (student.cardStatus === 'active') {
+          activeCards++;
+        } else if (student.cardStatus === 'expired') {
+          expiredCards++;
+        }
       }
     });
 
     this.stats.activeCards = activeCards;
     this.stats.expiredCards = expiredCards;
+  }
+
+  private getStudentCard(studentEmail: string): any {
+    const card = localStorage.getItem(`card_${studentEmail}`);
+    return card ? JSON.parse(card) : null;
+  }
+
+  private isCardExpired(card: any): boolean {
+    if (!card.expirationDate) return false;
+    
+    const expirationDate = new Date(card.expirationDate);
+    const today = new Date();
+    
+    // Considerar expirado se a data for anterior a hoje
+    return expirationDate < today;
   }
 
   private loadRecentActivity() {
@@ -71,6 +107,7 @@ export class AdminDashboard implements OnInit {
     
     this.recentActivity = [];
 
+    // Adicionar solicitações recentes (últimas 5)
     const recentRequests = pendingRequests
       .slice(-5)
       .map((request: any) => ({
@@ -80,6 +117,7 @@ export class AdminDashboard implements OnInit {
         type: 'request'
       }));
 
+    // Adicionar logins recentes (últimos 5 estudantes que fizeram login)
     const recentLogins = students
       .filter((student: any) => student.lastLogin)
       .sort((a: any, b: any) => new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime())
@@ -128,5 +166,26 @@ export class AdminDashboard implements OnInit {
   logout() {
     localStorage.removeItem('currentUser');
     this.router.navigate(['/login']);
+  }
+  refreshExpiredStatus() {
+    const students = this.getStudents();
+    let updatedCount = 0;
+
+    students.forEach((student: any) => {
+      const card = this.getStudentCard(student.email);
+      if (card && card.status === 'active' && this.isCardExpired(card)) {
+        // Atualizar status para expirado
+        card.status = 'expired';
+        localStorage.setItem(`card_${student.email}`, JSON.stringify(card));
+        updatedCount++;
+      }
+    });
+
+    if (updatedCount > 0) {
+      alert(`✅ ${updatedCount} carteirinha(s) expirada(s) foram atualizadas!`);
+      this.loadDashboardData(); // Recarregar estatísticas
+    } else {
+      alert('ℹ️ Nenhuma carteirinha precisa ser atualizada.');
+    }
   }
 }

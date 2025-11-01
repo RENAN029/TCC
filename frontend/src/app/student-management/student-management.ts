@@ -14,6 +14,7 @@ interface Student {
   registeredAt: string;
   personalInfo?: any;
   address?: any;
+  rejectionReason?: string;
 }
 
 @Component({
@@ -43,9 +44,61 @@ export class StudentManagement implements OnInit {
   }
 
   loadStudents() {
+    // Carregar estudantes REAIS do localStorage
     const savedStudents = localStorage.getItem('students');
-    this.students = savedStudents ? JSON.parse(savedStudents) : [];
+    const students = savedStudents ? JSON.parse(savedStudents) : [];
+    
+    // Atualizar status das carteirinhas baseado na data de expiração
+    this.students = students.map((student: Student) => {
+      const card = this.getStudentCard(student.email);
+      if (card && card.status === 'active') {
+        // Verificar se a carteirinha ativa está expirada
+        if (this.isCardExpired(card)) {
+          // Atualizar status para expirado
+          student.cardStatus = 'expired';
+          // Também atualizar a carteirinha
+          card.status = 'expired';
+          localStorage.setItem(`card_${student.email}`, JSON.stringify(card));
+        }
+      }
+      return student;
+    });
+
     this.applyFilters();
+  }
+
+  private getStudentCard(studentEmail: string): any {
+    const card = localStorage.getItem(`card_${studentEmail}`);
+    return card ? JSON.parse(card) : null;
+  }
+
+  private isCardExpired(card: any): boolean {
+    if (!card.expirationDate) return false;
+    
+    const expirationDate = new Date(card.expirationDate);
+    const today = new Date();
+    
+    // Considerar expirado se a data for anterior a hoje
+    return expirationDate < today;
+  }
+
+  isCardExpiredForStudent(student: Student): boolean {
+    const card = this.getStudentCard(student.email);
+    if (card) {
+      return this.isCardExpired(card);
+    }
+    return false;
+  }
+
+  getActualStudentStatus(student: Student): string {
+    const card = this.getStudentCard(student.email);
+    if (card) {
+      if (card.status === 'active' && this.isCardExpired(card)) {
+        return 'expired';
+      }
+      return card.status;
+    }
+    return student.cardStatus;
   }
 
   applyFilters() {
@@ -55,7 +108,8 @@ export class StudentManagement implements OnInit {
         student.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         student.registrationNumber.toLowerCase().includes(this.searchTerm.toLowerCase());
       
-      const matchesStatus = this.filterStatus === 'all' || student.cardStatus === this.filterStatus;
+      const actualStatus = this.getActualStudentStatus(student);
+      const matchesStatus = this.filterStatus === 'all' || actualStatus === this.filterStatus;
       
       return matchesSearch && matchesStatus;
     });
@@ -80,11 +134,14 @@ export class StudentManagement implements OnInit {
 
   removeStudent(student: Student) {
     if (confirm(`Tem certeza que deseja remover o estudante ${student.name}?\n\nEsta ação não poderá ser desfeita.`)) {
+      // Remover estudante da lista
       this.students = this.students.filter(s => s.id !== student.id);
       localStorage.setItem('students', JSON.stringify(this.students));
       
+      // Remover carteirinha se existir
       localStorage.removeItem(`card_${student.email}`);
       
+      // Remover pedidos pendentes se existirem
       this.removeStudentPendingRequests(student.email);
       
       this.applyFilters();
@@ -127,8 +184,8 @@ export class StudentManagement implements OnInit {
     return statusMap[status] || status;
   }
 
-  isCardExpired(student: Student): boolean {
-    if (!student.cardExpiration) return false;
-    return new Date(student.cardExpiration) < new Date();
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.router.navigate(['/login']);
   }
 }

@@ -2,7 +2,7 @@
   <div class="header-section">
     <button routerLink="/admin-dashboard" class="back-button">← Voltar</button>
     <h1>Gerenciar Estudantes</h1>
-    <p>Visualize e gerencie os estudantes cadastrados no sistema</p>
+    <button (click)="logout()" class="logout-button">🚪 Sair</button>
   </div>
 
   <div class="controls-section">
@@ -28,10 +28,6 @@
         <option value="rejected">Solicitação Rejeitada</option>
         <option value="none">Sem Carteirinha</option>
       </select>
-
-      <button (click)="exportStudents()" class="btn btn-secondary">
-        📊 Exportar Dados
-      </button>
     </div>
   </div>
 
@@ -46,21 +42,21 @@
           {{ student.name.charAt(0).toUpperCase() }}
         </div>
         <div class="student-details">
-          <h3>{{ student.name }}</h3>
+          <h3>{{ student.name || 'Nome não informado' }}</h3>
           <p class="student-email">{{ student.email }}</p>
           <p class="student-registration">Matrícula: {{ student.registrationNumber }}</p>
         </div>
       </div>
 
       <div class="student-status">
-        <span [class]="'status-badge ' + student.cardStatus">
-          {{ getStatusText(student.cardStatus) }}
+        <span [class]="'status-badge ' + getActualStudentStatus(student)">
+          {{ getStatusText(getActualStudentStatus(student)) }}
         </span>
-        <p *ngIf="student.cardExpiration" class="expiration-date">
-          Expira em: {{ student.cardExpiration | date:'dd/MM/yyyy' }}
+        <p *ngIf="getActualStudentStatus(student) === 'expired'" class="expired-warning">
+          ⚠️ Expirada
         </p>
-        <p *ngIf="isCardExpired(student)" class="expired-warning">
-          ⚠️ Carteirinha expirada
+        <p *ngIf="isCardExpiredForStudent(student) && getActualStudentStatus(student) === 'active'" class="expired-warning">
+          ⚠️ Expirada (atualize a página)
         </p>
       </div>
 
@@ -82,78 +78,6 @@
       <div class="no-students-icon">👥</div>
       <h3>Nenhum estudante encontrado</h3>
       <p>Tente ajustar os filtros ou termos de busca.</p>
-    </div>
-  </div>
-
-  <!-- Modal de Detalhes -->
-  <div *ngIf="selectedStudent" class="modal-overlay" (click)="closeDetails()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Detalhes do Estudante</h2>
-        <button (click)="closeDetails()" class="close-button">×</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="student-profile">
-          <div class="profile-avatar">
-            {{ selectedStudent.name.charAt(0).toUpperCase() }}
-          </div>
-          <div class="profile-info">
-            <h3>{{ selectedStudent.name }}</h3>
-            <p>{{ selectedStudent.email }}</p>
-          </div>
-        </div>
-
-        <div class="details-grid">
-          <div class="detail-item">
-            <label>Número de Matrícula:</label>
-            <span>{{ selectedStudent.registrationNumber }}</span>
-          </div>
-          
-          <div class="detail-item">
-            <label>Status da Carteirinha:</label>
-            <span [class]="'status-badge ' + selectedStudent.cardStatus">
-              {{ getStatusText(selectedStudent.cardStatus) }}
-            </span>
-          </div>
-
-          <div class="detail-item" *ngIf="selectedStudent.cardExpiration">
-            <label>Data de Expiração:</label>
-            <span>{{ selectedStudent.cardExpiration | date:'dd/MM/yyyy' }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Último Login:</label>
-            <span>{{ selectedStudent.lastLogin | date:'dd/MM/yyyy HH:mm' }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Cadastrado em:</label>
-            <span>{{ selectedStudent.registeredAt | date:'dd/MM/yyyy' }}</span>
-          </div>
-        </div>
-
-        <div class="warning-section" *ngIf="isCardExpired(selectedStudent)">
-          <div class="warning-icon">⚠️</div>
-          <div class="warning-content">
-            <h4>Carteirinha Expirada</h4>
-            <p>A carteirinha deste estudante está expirada. Ele não pode mais usar o transporte escolar.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button 
-          (click)="removeStudent(selectedStudent)"
-          class="btn btn-danger">
-          🗑️ Remover Estudante
-        </button>
-        <button 
-          (click)="closeDetails()"
-          class="btn btn-secondary">
-          Fechar
-        </button>
-      </div>
     </div>
   </div>
 </div>
