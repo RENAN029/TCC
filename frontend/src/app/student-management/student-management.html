@@ -39,7 +39,7 @@
     <div *ngFor="let student of filteredStudents" class="student-card">
       <div class="student-main-info">
         <div class="student-avatar">
-          {{ student.name.charAt(0).toUpperCase() }}
+          {{ student.name ? student.name.charAt(0).toUpperCase() : '?' }}
         </div>
         <div class="student-details">
           <h3>{{ student.name || 'Nome não informado' }}</h3>
@@ -78,6 +78,153 @@
       <div class="no-students-icon">👥</div>
       <h3>Nenhum estudante encontrado</h3>
       <p>Tente ajustar os filtros ou termos de busca.</p>
+    </div>
+  </div>
+
+  <!-- Modal de Detalhes do Estudante -->
+  <div *ngIf="selectedStudent" class="modal-overlay" (click)="closeDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalhes do Estudante</h2>
+        <button (click)="closeDetails()" class="close-button">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Perfil do Estudante -->
+        <div class="student-profile">
+          <div class="profile-avatar">
+            {{ selectedStudent.name ? selectedStudent.name.charAt(0).toUpperCase() : '?' }}
+          </div>
+          <div class="profile-info">
+            <h3>{{ selectedStudent.name || 'Nome não informado' }}</h3>
+            <p>{{ selectedStudent.email }}</p>
+          </div>
+        </div>
+
+        <!-- Informações Básicas -->
+        <div class="detail-section">
+          <h3>Informações Básicas</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Email:</label>
+              <span>{{ selectedStudent.email }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Matrícula:</label>
+              <span>{{ selectedStudent.registrationNumber }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Status:</label>
+              <span [class]="'status-badge ' + getActualStudentStatus(selectedStudent)">
+                {{ getStatusText(getActualStudentStatus(selectedStudent)) }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Cadastrado em:</label>
+              <span>{{ selectedStudent.registeredAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Último login:</label>
+              <span>{{ selectedStudent.lastLogin ? (selectedStudent.lastLogin | date:'dd/MM/yyyy HH:mm') : 'Nunca logou' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações da Carteirinha -->
+        <div class="detail-section" *ngIf="getStudentCard(selectedStudent.email)">
+          <h3>Informações da Carteirinha</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>ID da Carteirinha:</label>
+              <span>{{ getStudentCard(selectedStudent.email)?.id }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Data de Emissão:</label>
+              <span>{{ getStudentCard(selectedStudent.email)?.issueDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Data de Expiração:</label>
+              <span>{{ getStudentCard(selectedStudent.email)?.expirationDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Curso:</label>
+              <span>{{ getStudentCard(selectedStudent.email)?.course || 'Não informado' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="getStudentCard(selectedStudent.email)?.rejectionReason">
+              <label>Motivo da Recusa:</label>
+              <span class="rejection-reason-text">{{ getStudentCard(selectedStudent.email)?.rejectionReason }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações Pessoais -->
+        <div class="detail-section" *ngIf="selectedStudent.personalInfo">
+          <h3>Informações Pessoais</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nome Completo:</label>
+              <span>{{ selectedStudent.personalInfo.name }}</span>
+            </div>
+            <div class="detail-item">
+              <label>CPF:</label>
+              <span>{{ selectedStudent.personalInfo.cpf }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Data de Nascimento:</label>
+              <span>{{ selectedStudent.personalInfo.birthDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Gênero:</label>
+              <span>{{ selectedStudent.personalInfo.gender }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Escolaridade:</label>
+              <span>{{ getEducationLevelText(selectedStudent.personalInfo.educationLevel) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="detail-section" *ngIf="selectedStudent.address">
+          <h3>Endereço</h3>
+          <div class="address-info">
+            <p><strong>Logradouro:</strong> {{ selectedStudent.address.street }}, {{ selectedStudent.address.number }}</p>
+            <p><strong>Bairro:</strong> {{ selectedStudent.address.neighborhood }}</p>
+            <p><strong>Cidade/Estado:</strong> {{ selectedStudent.address.city }} - {{ selectedStudent.address.state }}</p>
+          </div>
+        </div>
+
+        <!-- Aviso de Carteirinha Expirada -->
+        <div *ngIf="isCardExpiredForStudent(selectedStudent) && getActualStudentStatus(selectedStudent) === 'active'" class="warning-section">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <h4>Carteirinha Expirada</h4>
+            <p>Esta carteirinha está com status "Ativa" mas a data de expiração já passou. O status será atualizado automaticamente.</p>
+          </div>
+        </div>
+
+        <!-- Aviso de Sem Informações -->
+        <div *ngIf="!selectedStudent.personalInfo" class="info-section">
+          <div class="info-icon">ℹ️</div>
+          <div class="info-content">
+            <h4>Informações Incompletas</h4>
+            <p>Este estudante ainda não completou o cadastro de informações pessoais.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          (click)="removeStudent(selectedStudent)"
+          class="btn btn-danger">
+          🗑️ Remover Estudante
+        </button>
+        <button 
+          (click)="closeDetails()"
+          class="btn btn-secondary">
+          Fechar
+        </button>
+      </div>
     </div>
   </div>
 </div>

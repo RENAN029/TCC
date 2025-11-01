@@ -67,7 +67,8 @@ export class StudentManagement implements OnInit {
     this.applyFilters();
   }
 
-  private getStudentCard(studentEmail: string): any {
+  // CHANGE FROM private TO public
+  public getStudentCard(studentEmail: string): any {
     const card = localStorage.getItem(`card_${studentEmail}`);
     return card ? JSON.parse(card) : null;
   }
@@ -182,6 +183,17 @@ export class StudentManagement implements OnInit {
       'none': 'Sem Carteirinha'
     };
     return statusMap[status] || status;
+  }
+
+  getEducationLevelText(level: string): string {
+    const levels: { [key: string]: string } = {
+      'ensino_medio': 'Ensino Médio',
+      'graduacao': 'Graduação',
+      'pos_graduacao': 'Pós-Graduação',
+      'mestrado': 'Mestrado',
+      'doutorado': 'Doutorado'
+    };
+    return levels[level] || level;
   }
 
   logout() {
